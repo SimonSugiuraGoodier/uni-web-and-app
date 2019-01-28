@@ -1,0 +1,130 @@
+<?php
+session_start();
+include 'conection.php';
+$id = htmlspecialchars($_GET["id"]);
+if (!(isset($_COOKIE["user_cookie"]))) {
+header("Location: login.php");
+}
+?>
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <script src="js/bootstrap.js"></script>
+        <title>Trips</title>
+    </head>
+
+    <body>
+        <!--https://getbootstrap.com/docs/3.3/components/#navbar this had been minimally modified for my uses -->
+        <nav class="navbar navbar-inverse">
+
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="index.html">Greenwich Pool</a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="#bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li><a href="index.html">Home <span class="sr-only">(current)</span></a></li>
+                        <li class="active"><a href="trips.html">Trips<span class="sr-only">(current)</span></a></li>
+                        <li><a href="forum.html">Forum<span class="sr-only">(current)</span></a></li>
+                    </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="logout.php">Logout</a></li>
+                    </ul>
+                </div>
+                <!-- /.navbar-collapse -->
+
+            </div>
+            <!-- /.container-fluid -->
+        </nav>
+        <div class="container-fluid text-center">
+            <div class="row content">
+
+                <div class="col-sm-12 text-left">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Starting Point</th>
+                                <th>End Point</th>
+                                <th>Trip Details</th>
+                                <th>Car Type</th>
+                                <th>Insurance</th>
+                                <th>Time And Date</th>
+                                <th>Licecne</th>
+                                <th>Obtaining or providing</th>
+                                <th>Cost</th>
+                            </tr>
+                        </thead>
+
+
+                        <?php
+$sql = "SELECT * FROM trips WHERE ID = '$id'";
+$result = $conn->query($sql);
+$row = $result->fetch_assoc();
+?>
+                        <tr>
+                            <td>
+                                <?php echo $row["Username"];?>
+                            </td>
+                            <td>
+                                <?php echo $row["trip_from"];?>
+                            </td>
+                            <td>
+                                <?php echo $row["trip_to"];?>
+                            </td>
+                            <td>
+                                <?php echo $row["trip_details"]; ?>
+                            </td>
+                            <td>
+                                <?php echo $row["car_type"]; ?>
+                            </td>
+                            <td>
+                                <?php echo $row["insurance"]; ?>
+                            </td>
+                            <td>
+                                <?php echo $row["time_date"]; ?>
+                            </td>
+                            <td>
+                                <?php echo $row["licence"]; ?>
+                            </td>
+                            <td>
+                                <?php echo $row["obtain_provide"]; ?>
+                            </td>
+                            <td>
+                                <?php echo $row["cost"]; ?>
+                            </td>
+                    </table>
+
+                </div>
+                <?php
+$sql_image = "SELECT * FROM images WHERE trip_id = '$id'";
+$queary = $conn->query($sql_image);
+
+
+if ($result->num_rows > 0){
+while ($row=mysqli_fetch_array($queary)){ ?>
+                <div class="col-md-4">
+                    <?php echo '<img class="img-responsive" src="data:image/jpeg;base64,'.base64_encode( $row['img'] ).' alt"post.jpeg" width="460" height="345"/>'; //https://stackoverflow.com/questions/20556773/php-display-image-blob-from-mysql ?>
+                </div>
+                <?php }
+} else { ?>
+                <p>no images yet!</p>
+                <?php   } ?>
+            </div>
+        </div>
+    </body>
+
+</html>

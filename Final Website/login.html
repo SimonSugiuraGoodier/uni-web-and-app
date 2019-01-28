@@ -1,0 +1,99 @@
+<?php
+session_start();
+include 'conection.php';
+if ((isset($_POST['submit']))){
+$username = trim($_POST['username']);
+$cookieUserName = $username;
+$password = trim($_POST['pass']);
+$sql = "SELECT * FROM user_account WHERE USERNAME ='$username'";
+$result = mysqli_query($conn, $sql);
+$noRows = mysqli_num_rows($result);
+if($noRows == 1){
+$row =  mysqli_fetch_assoc($result);
+if((password_verify($password,$row['PASSWORD']))){ //http://www.wdb24.com/how-to-use-php-password_hash-registration-login-form/
+$sql_varify = "SELECT * FROM user_account WHERE username = '$username' and varify_Compleate = 0 ";
+$result_varify = mysqli_query($conn, $sql_varify);
+$check_varify = mysqli_fetch_array($result_varify);
+if (isset($check_varify)){
+setcookie('user_cookie', $cookieUserName, time() + 86400, '/'); // change time;
+header("Location: varify.php");
+} else {
+$_SESSION['user_session'] = "$cookieUserName"; // fix session
+setcookie('user_cookie', $cookieUserName, time() + 86400, '/'); // change time
+header("Location: index.php");
+}
+} else {
+echo "Please Re-Enter Username and Password";
+}    
+}
+}
+
+?>
+
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <script src="js/bootstrap.js"></script>
+        <meta charset="utf-8">
+        <title>Login</title>
+    </head>
+    <!--  https://getbootstrap.com/docs/3.3/components/#navbar   -->
+    <body>
+        <nav class="navbar navbar-inverse">
+
+            <div class="container-fluid">
+
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="index.html">Greenwich Pool</a>
+                </div>
+                <div class="collapse navbar-collapse" id="navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li><a href="index.html">Home <span class="sr-only">(current)</span></a></li>
+                        <li><a href="trips.html">Trips<span class="sr-only">(current)</span></a></li>
+                        <li><a href="forum.html">Forum<span class="sr-only">(current)</span></a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="active"><a href="login.hstml">Login</a></li>
+                        <li><a href="logout.php">Logout</a></li>
+                    </ul>
+                </div>
+                <!-- /.navbar-collapse -->
+            </div>
+            <!-- /.container-fluid -->
+        </nav>
+        <!-- Navbar container -->
+
+        <div class="container" method="post">
+            <h2>login</h2>
+            <form method="post">
+                <div class="form-group">
+                    <label for="usr">User Name:</label>
+                    <input name="username" type="text" class="form-control" id="usr" placeholder="Enter Username" required autofocus="autofocus">
+                </div>
+                <div class="form-group">
+                    <label for="pwd">Password:</label>
+                    <input name="pass" type="password" class="form-control" id="pwd" placeholder="Enter Password" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" name="submit" class="btn btn-default btn-block">Login</button>
+                </div>
+                <div class="form-group">
+                    Don't hava a account?
+                    <br>
+                    <a href="create.php">Create a account</a>
+                </div>
+            </form>
+        </div>
+    </body>
+
+</html>

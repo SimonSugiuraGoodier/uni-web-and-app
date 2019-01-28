@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<?php
+session_start();
+include 'conection.php';
+if (isset($_POST['submit'])){
+$username = mysqli_real_escape_string($conn,$_POST['username']);
+$password = mysqli_real_escape_string($conn,$_POST['pass']);
+$captcha = $_POST['captcha'];
+$password_hash =  password_hash($password , PASSWORD_DEFAULT); // https://stackoverflow.com/questions/30279321/how-to-use-password-hash
+
+if (isset($_SESSION["captcha"])){
+if ($_SESSION["captcha"] == $captcha) {
+$email = $_POST['email'];
+$length = 5; //Generator for activation code
+$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+$charactersLength = strlen($characters);
+$varification1 = '';
+
+$sql_prevent = "SELECT * FROM user_account WHERE USERNAME ='$username'";
+$result = mysqli_query($conn, $sql_prevent);
+$noRows = mysqli_num_rows($result);
+if ($noRows != 1){
+for ($i = 0; $i < $length; $i++) {
+$varification1 .= $characters[rand(0, $charactersLength - 1)];
+}
+$sql = "INSERT INTO user_account(USERNAME, PASSWORD, EMAIL, varification, varify_Compleate) VALUES ('$username', '$password_hash', '$email', '$varification1', '0')";
+if ($conn->query($sql) === TRUE) {
+$to = $email;
+$subject = "Varify your Greenwich Pool Account";
+$txt = $varification1;
+$headers = "From: account@greenwichpool.com";
+mail($to,$subject,$txt,$headers);
+header('Location: varify.php');
+setcookie('user_cookie', $cookieUserName, time() + 86400, '/'); // change time
+} else {
+echo "Error: " .$sql . "<br>". $conn->error;
+}
+
+} else {
+echo "username exists";
+} 
+} else {
+echo "incorrect captcha";
+}
+} else {
+echo "fix the session";
+}
+} 
+?>
+<!--  https://getbootstrap.com/docs/3.3/components/#navbar   -->
+<html>
+    <head>
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <script src="js/bootstrap.js"></script> 
+        <title>Create User</title>
+    </head>
+
+    <body>
+
+        <nav class="navbar navbar-inverse">
+
+            <div class="container-fluid">
+
+                <div class="navbar-header">
+
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="index.html">Greenwich Pool</a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li><a href="index.html">Home <span class="sr-only">(current)</span></a></li>
+                        <li><a href="trips.html">Trips<span class="sr-only">(current)</span></a></li>
+                        <li><a href="forum.html">Forum<span class="sr-only">(current)</span></a></li>
+                    </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="active"><a href="login.html">Create Account</a></li>
+                        <li><a href="logout.php">Logout</a></li>
+                    </ul>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+
+        <div class="container">
+            <h2>Create An Account</h2>
+            <form method="post">
+                <div class="form-group">
+                    <label for="usr">Username:</label>
+                    <input name="username" type="text" class="form-control" id="usr" required placeholder="Enter Username">
+                </div>
+                <div class="form-group">
+                    <label for="usr">email:</label>
+                    <input name="email" type="email" class="form-control" id="email" required placeholder="Enter Email">
+                </div>
+                <div class="form-group">
+                    <label for="pwd">Password:</label>
+                    <input name="pass" type="password" class="form-control" id="pwd" required placeholder="Enter Password">
+                </div>
+                <div class="form-group">
+                    <label for="pwd">Re-Type Password:</label>
+                    <input name="re_pass" type="password" class="form-control" id="pwd" required placeholder="Re-Enter Password">
+                </div>
+                <div class="form-group">
+                    <label for="captcha">Captcha</label>
+                    <img class="img-responsive" src="captcha.php" alt="image"> <br>
+                    <input name="captcha" type="text" class="form-control" id="captcha" required placeholder="Please enter captcha code above">
+
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-default btn-block" name="submit" >Complete</button>
+                </div>
+            </form>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,153 @@
+<?php 
+session_start();
+include 'conection.php';
+if (!(isset($_COOKIE["user_cookie"]))) {
+header("Location: login.php");
+}
+if (isset($_POST['submit'])){
+
+//https://stackoverflow.com/questions/129677/whats-the-best-method-for-sanitizing-user-input-with-php
+$start = mysqli_real_escape_string($conn,$_POST['start']); 
+$end = mysqli_real_escape_string($conn,$_POST['end']);
+$details = mysqli_real_escape_string($conn,$_POST['details']);
+$vehicle_type = mysqli_real_escape_string($conn,$_POST['vehicle_type']);
+$insurance = mysqli_real_escape_string($conn,$_POST['insurance']);
+$cost = mysqli_real_escape_string($conn,$_POST['cost']);
+$date_time =  mysqli_real_escape_string($conn,$_POST['date']);
+$licence = mysqli_real_escape_string($conn,$_POST['licence']);
+$obtain_provide =  mysqli_real_escape_string($conn,$_POST['provide_obtain']);
+$username = $_COOKIE["user_cookie"];
+$sql = "INSERT INTO trips(username, trip_from, trip_to, trip_details, car_type, insurance, cost, time_date, licence, obtain_provide) VALUES ('$username', '$start', '$end', '$details', '$vehicle_type', '$insurance', '$cost', '$date_time', '$licence', '$obtain_provide')"; // add username from session
+//          if ($conn->query($sql) === TRUE) {
+
+
+// need to get the trip id of the current trip
+
+if ($conn->query($sql) === TRUE) {
+$trip_id = mysqli_insert_id($conn);
+//foreach($_ FILES['userImage']['name'] as $key => $tmp_name)
+if(count($_FILES) > 1){ //http://phppot.com/php/mysql-blob-using-php/
+if(is_uploaded_file($_FILES['userImage']['tmp_name'])){
+$imgData = addslashes(file_get_contents($_FILES['userImage']['tmp_name']));
+$imageProperties = getimageSize($_FILES['userImage']['tmp_name']);
+$img_sql = "INSERT INTO images(trip_id, img, img_type) VALUES ('$trip_id' ,'{$imgData}', '{$imageProperties['mime']}')";
+if($conn->query($img_sql) === TRUE) {
+header("Location: trips.php");
+} else {
+echo "Error: " .$sql . "<br>". $conn->error;
+}
+}
+}
+header("Location: trips.php");
+} else {
+echo "Error: " .$sql . "<br>". $conn->error;
+}
+}
+//    }
+?>
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <script src="js/bootstrap.js"></script>
+        <meta charset="utf-8">
+        <title>Create Trip</title>
+    </head>
+    <!--  https://getbootstrap.com/docs/3.3/components/#navbar   -->
+    <body>
+        <nav class="navbar navbar-inverse">
+
+            <div class="container-fluid">
+
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="index.html">Greenwich Pool</a>
+                </div>
+                <div class="collapse navbar-collapse" id="navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li><a href="index.html">Home <span class="sr-only">(current)</span></a></li>
+                        <li class="active"><a href="trips.html">Trips<span class="sr-only">(current)</span></a></li>
+                        <li><a href="forum.html">Forum<span class="sr-only">(current)</span></a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="logout.php">Logout</a></li>
+                    </ul>
+                </div>
+                <!-- /.navbar-collapse -->
+            </div>
+            <!-- /.container-fluid -->
+        </nav>
+        <!-- Navbar container -->
+
+        <div class="container">
+            <h2>Create An Trip</h2>
+            <form name="imageForm" action="" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="starting">Starting Point:</label>
+                    <input name="start" type="text" class="form-control" id="start" required placeholder="Starting Point">
+                </div>
+                <div class="form-group">
+                    <label for="destination">Destination:</label>
+                    <input name="end" type="text" class="form-control" id="email" required placeholder="Destination">
+                </div>
+                <div class="form-group">
+                    <label for="details">Further Trip Details:</label>
+                    <textarea name="details" class="form-control" rows="5" id="comment"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="vehicle_type">Vehicle type:</label>
+                    <input name="vehicle_type" type="text" class="form-control" id="type" required placeholder="Vehicle type">
+                </div>
+                <div class="form-group">
+                    <label for="licence">Licence status:</label>
+                    <select name="licence" type="text" class="form-control" id="select" required>
+                        <option>Please select</option>
+                        <option value="full uk">Full UK Licence</option>
+                        <option value="full international">Full International Licence</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="insurance">Insurance details:</label>
+                    <select name="insurance" type="text" class="form-control" id="select" required>
+                        <option>Please select</option>
+                        <option value="Current">Current</option>
+                        <option value="Non Current">Non Current</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="cost">Cost:</label>
+                    <input name="cost" type="number" class="form-control" id="cost" required placeholder="Cost">
+                </div>
+                <div class="form-group">
+                    <label for="date">Date and Time:</label>
+                    <input name="date" type="datetime-local" class="form-control" id="cost" required placeholder="">
+                </div>
+                <div class="form-group">
+                    <label for="provide_obtain">Obtain or Provide Lift:</label>
+                    <select name="provide_obtain" type="text" class="form-control" id="select" required>
+                        <option>Please select</option>
+                        <option value="obtain">Obtain</option>
+                        <option value="provide">Provide</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="upload">Upload Images:</label>
+                    <input type="file" name="userImage" id="image" class="inputFile" />
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-default btn-block" name="submit">Complete</button>
+                </div>
+            </form>
+        </div>
+    </body>
+
+</html>

@@ -1,0 +1,75 @@
+<?php
+session_start();
+include 'conection.php';
+if (isset($_POST['submit'])){
+$varify = mysqli_real_escape_string($conn,$_POST['varify']);
+$username = $_COOKIE["user_cookie"];
+$sql = "SELECT * FROM user_account WHERE varification = '$varify' and username = '$username'";
+$result = mysqli_query($conn, $sql);
+$check = mysqli_fetch_array($result);
+if (isset($check)) {
+$sql_update = "UPDATE user_account SET varify_Compleate = '1' WHERE varification = '".$varify."'";
+$result = mysqli_query($conn, $sql_update);
+header("Location: index.php");
+} else {
+echo "Please re-enter the varificaiton code";
+}
+}
+?>
+
+<html>
+
+    <head>
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <script src="js/bootstrap.js"></script>
+        <title>Varification</title>
+    </head>
+    <!--  https://getbootstrap.com/docs/3.3/components/#navbar   -->
+    <body>
+        <nav class="navbar navbar-inverse">
+
+            <div class="container-fluid">
+
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="index.html">Greenwich Pool</a>
+                </div>
+                <div class="collapse navbar-collapse" id="navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li><a href="index.html">Home <span class="sr-only">(current)</span></a></li>
+                        <li><a href="trips.html">Trips<span class="sr-only">(current)</span></a></li>
+                        <li><a href="forum.html">Forum<span class="sr-only">(current)</span></a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="active"><a href="login.html">Verify Account</a></li>
+                        <li><a href="logout.php">Logout</a></li>
+                    </ul>
+                </div>
+                <!-- /.navbar-collapse -->
+            </div>
+            <!-- /.container-fluid -->
+        </nav>
+        <!-- Navbar container -->
+
+        <div class="container" method="post">
+            <h2>Varify Account</h2>
+            <form method="post">
+                <div class="form-group">
+                    <label for="usr">Varification Code:</label>
+                    <input name="varify" type="text" class="form-control" id="usr" placeholder="Enter Code from Email" required autofocus="autofocus">
+                </div>
+                <div class="form-group">
+                    <button type="submit" name="submit" class="btn btn-default btn-block">Varify</button>
+                </div>
+            </form>
+        </div>
+    </body>
+
+</html>

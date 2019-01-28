@@ -1,0 +1,117 @@
+<?php
+session_start();
+include 'conection.php';
+$username = htmlspecialchars($_GET["id"]);
+if (!(isset($_COOKIE["user_cookie"]))) {
+header("Location: login.php");
+}
+if((isset($_POST['submit']))){
+$username_search = $_POST['username_search'];
+header("Location: search.php?id=$username_search");
+}
+?>
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <script src="js/bootstrap.js"></script>
+        <meta charset="utf-8">
+        <title>Login</title>
+    </head>
+    <!--  https://getbootstrap.com/docs/3.3/components/#navbar   -->
+    <body>
+        <nav class="navbar navbar-inverse">
+
+            <div class="container-fluid">
+
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="index.html">Greenwich Pool</a>
+                </div>
+                <div class="collapse navbar-collapse" id="navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li><a href="index.html">Home <span class="sr-only">(current)</span></a></li>
+                        <li><a class="active" href="trips.html">Trips<span class="sr-only">(current)</span></a></li>
+                        <li><a href="forum.html">Forum<span class="sr-only">(current)</span></a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="logout.php">Logout</a></li>
+                    </ul>
+                </div>
+                <!-- /.navbar-collapse -->
+            </div>
+            <!-- /.container-fluid -->
+        </nav>
+        <!-- Navbar container -->
+        <div class="container-fluid text-center">
+            <div class="row content">
+
+                <div class="col-sm-12 text-left">
+                    <form method="post">
+                        <div class="container-fludi">
+                            <label for="usr_serch">User Search:</label>
+                        </div>
+                        <div class="container-fludi">
+                            <input name="username_search" type="text" class="form-control" id="user_search" placeholder="Enter Username">
+                        </div> <br>
+                        <div class="container-fludi">
+                            <button type="submit" class="btn btn-default btn-block" name="submit">User Search</button>
+                        </div> <br>
+                    </form>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Starting Point</th>
+                                <th>End Point</th>
+                                <th>Trip Details</th>
+                            </tr>
+                        </thead>
+                        <?php
+$sql = "SELECT * FROM trips WHERE username = '$username'";
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0){
+while ($row = $result->fetch_assoc()){ ?>
+
+                        <tr>
+                            <td>
+                                <a href="postInfo.php?id=<?php echo $row['ID']?>">
+                                    <?php echo $row["Username"];?>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="postInfo.php?id=<?php echo $row['ID']?>">
+                                    <?php echo $row["trip_from"];?>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="postInfo.php?id=<?php echo $row['ID']?>">
+                                    <?php echo $row["trip_to"];?> </a>
+                            </td>
+                            <td>
+                                <a href="postInfo.php?id=<?php echo $row['ID']?>">
+                                    <?php echo $row["cost"]; ?> </a>
+                            </td>
+                        </tr>
+                        <?php
+}
+} else { ?>
+                        <p>No resluts for the typed username please search again.</p>
+                        <?php } ?>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </body>
+
+</html>

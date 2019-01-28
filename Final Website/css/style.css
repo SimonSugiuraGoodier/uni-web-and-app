@@ -1,0 +1,29 @@
+body {
+    background-color: whitesmoke;
+    font-family: "Verdana", Geneva, sans-serif;
+    
+} h1 {
+    color: black;
+    font-size: 175%;
+} p {
+    color: balck;
+    font-size: 90%;
+} ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+} .button {
+    height: 20%;
+    background-color: #fff;
+    border: none;
+    color: black;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+} input {
+    width: 70%;
+    margin: 8px 0;
+    border: 2px;
+} inpuut:focus {
+    border: 5px solid #555;
+}
